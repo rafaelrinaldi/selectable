@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "start": "parcel serve index.html"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-alpha.3.2",
+    "prettier-standard": "^16.2.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@reach/auto-id": "^0.10.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
