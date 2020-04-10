@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "start": "start-storybook -p 6006 --ci --quiet",
     "build": "build-storybook"
