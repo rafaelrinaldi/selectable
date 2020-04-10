@@ -1,65 +1,83 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, {
+  createElement,
+  FunctionComponent,
+  useEffect,
+  useState,
+} from "react";
 import { useId } from "@reach/auto-id";
 
+export type HTMLSelectable = "radio" | "checkbox";
+export type HTMLSelectableTag = "form" | "fieldset" | "div";
+
 export interface ISelectable {
+  checked?: boolean;
+  disabled?: boolean;
   id?: string;
   label: string;
   value: string;
-  checked?: boolean;
 }
 
 interface IProps {
-  name?: string;
+  as?: HTMLSelectableTag;
   data: ISelectable[];
   multiple?: boolean;
+  name?: string;
   onChange?: (values: string[]) => void;
 }
 
-type HTMLSelectable = "radio" | "checkbox";
-
 export const Selectable: FunctionComponent<IProps> = ({
-  name = useId("selectable"),
+  as = "form",
   data = [],
   multiple = false,
+  name = useId("selectable"),
   onChange = Function(),
 }) => {
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(
-      data
-        .filter(({ checked }) => checked)
-        .reduce((accumulator, current) => [...accumulator, current.value], [])
-    )
-  );
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const type: HTMLSelectable = multiple ? "checkbox" : "radio";
 
-  useEffect(() => onChange(Array.from(selected), selected));
+  // Update selected items based on `data` whenever it changes
+  useEffect(
+    () =>
+      setSelected(
+        new Set(
+          data
+            .filter(({ checked }) => checked)
+            .reduce((accumulator, { value }) => [...accumulator, value], [])
+        )
+      ),
+    [data]
+  );
 
-  return (
-    <form>
-      {data.map(({ id: _id, value, label }, index) => {
-        const id: string = _id ?? `${name}${index}`;
-        const checked: boolean = selected.has(value);
+  // Trigger `onChange` passing a list of selected items
+  useEffect(() => onChange(Array.from(selected)), [selected]);
 
-        return (
-          <label htmlFor={id} key={id}>
-            <input
-              id={id}
-              name={name}
-              type={type}
-              checked={checked}
-              onChange={(event) => {
-                const next: Set<string> = new Set(selected);
-                next.delete(value);
-                if (!multiple) next.clear();
-                if (event.target.checked) next.add(value);
+  return createElement(
+    as,
+    {},
+    data.map(({ id: _id, value, label, disabled }, index) => {
+      const id: string = _id ?? `${name}${index}`;
+      const checked: boolean = selected.has(value);
 
-                setSelected(next);
-              }}
-            />
-            {label}
-          </label>
-        );
-      })}
-    </form>
+      return (
+        <label htmlFor={id} key={id}>
+          <input
+            id={id}
+            name={name}
+            type={type}
+            disabled={disabled}
+            checked={checked}
+            onChange={(event) => {
+              const next: Set<string> = new Set(selected);
+              next.delete(value);
+              if (!multiple) next.clear();
+              if (event.target.checked) next.add(value);
+
+              setSelected(next);
+            }}
+          />
+          {label}
+        </label>
+      );
+    })
   );
 };

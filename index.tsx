@@ -10,8 +10,8 @@ const data: ISelectable[] = [
   { value: "ipsum", label: "Ipsum" },
 ];
 
-const onChange = (value) => console.log("selected", value);
+const onChange = (value) => console.log("Selected:", value);
 
-const App = () => <Selectable data={data} onChange={onChange} multiple />;
+const App = () => <Selectable data={data} onChange={onChange} />;
 
 render(<App />, document.querySelector("[data-app]"));
